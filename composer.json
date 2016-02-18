@@ -11,6 +11,9 @@
         "monolog/monolog": "^1.17",
         "phpmailer/phpmailer": "^5.2"
     },
+	"autoload": {
+		"classmap": ["lib/"]
+	},
     "authors": [
         {
             "name": "Flávio Veloso",
