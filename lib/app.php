@@ -51,9 +51,34 @@ class App {
 	}
 
 	protected function init_router() {
+		$this->router->addGet( 'request.submit', '/' );
+		$this->router->addPost( 'request.submit#submission', '/' );
+	}
+
+	protected function handle_request_submit() {
 	}
 
 	protected function handle_request() {
+		$path = $this->request->url->get( PHP_URL_PATH );
+		$route = $this->router->match( $path, $this->request->server->get() );
+		if ( ! $route ) {
+			throw new NotFoundException($path);
+		}
+
+		switch ( $route->params['action'] ) {
+
+		case 'request.submit':
+			$this->handle_request_submit();
+			break;
+
+		case 'request.submit#submission':
+			$this->handle_request_submit_submission();
+			break;
+
+		default:
+			throw new \RuntimeException( "Invalid action: "
+			                             . $route->params[ 'action' ] );
+		}
 	}
 
 	protected function handle_not_found() {
