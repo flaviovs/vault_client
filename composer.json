@@ -12,7 +12,8 @@
         "phpmailer/phpmailer": "^5.2"
     },
 	"autoload": {
-		"classmap": ["lib/"]
+		"classmap": ["lib/"],
+		"files": ["lib/bootstrap.php"]
 	},
     "authors": [
         {
