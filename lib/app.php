@@ -11,6 +11,7 @@ class App {
 	protected $conf;
 	protected $session;
 	protected $log;
+	protected $views;
 
 	public function __construct($name) {
 
@@ -30,6 +31,7 @@ class App {
 
 		$this->log = new \Monolog\Logger($name);
 
+		$this->views = new \UView\Registry( __DIR__ . '/../view' );
 	}
 
 	protected function init_logging() {
