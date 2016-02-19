@@ -71,8 +71,69 @@ class App {
 		$this->response->content->set($view);
 	}
 
+	protected function new_client() {
+		$url = $this->get_conf('vault', 'url');
+		$key = $this->get_conf('vault', 'key');
+		$secret = $this->get_conf('vault', 'secret');
+
+		if ( !$url ) {
+			throw new \RuntimeException( 'No Vault URL in config.ini' );
+		}
+		if ( !$key ) {
+			throw new \RuntimeException( 'No Vault key in config.ini' );
+		}
+		if ( !$secret ) {
+			throw new \RuntimeException( 'No Vault secret in config.ini' );
+		}
+
+		return new VaultClient($url, $key, $secret);
+	}
+
+	protected function get_request_form() {
+		$form = $this->views->get( 'request-form' );
+		return $form;
+	}
 
 	protected function handle_request_form() {
+		$this->display_page( 'Request a secret', $this->get_request_form() );
+	}
+
+	protected function handle_request_form_submission() {
+		$req_email = $this->request->post->get( 'req-email' );
+		$user_email = $this->request->post->get( 'user-email' );
+		$instructions = $this->request->post->get( 'instructions' );
+
+		$errors = [];
+		if ( empty( $req_email) || ! Valid::email( $req_email ) ) {
+			$errors[ 'req_email' ] = 'You need to provide a valid e-mail address.';
+		}
+
+		if ( empty( $user_email) || ! Valid::email( $user_email ) ) {
+			$errors[ 'user_email' ] = 'You need to provide a valid e-mail address.';
+		}
+
+		if ( $errors ) {
+			$form = $this->get_request_form();
+
+			$form->set( 'req_email', $req_email );
+			$form->set( 'user_email', $user_email );
+			$form->set( 'instructions', $instructions );
+
+			$form->set( 'req_email_error',
+			            isset( $errors[ 'req_email' ] ) ?
+			            $errors[ 'req_email' ] : NULL );
+			$form->set( 'user_email_error',
+			            isset( $errors[ 'user_email' ] ) ?
+			            $errors[ 'user_email' ] : NULL );
+
+			$this->display_page( 'Request a secret', $form );
+			return;
+		}
+
+
+		$client = $this->new_client();
+
+		$res = $client->add_request($user_email, $req_email, $instructions);
 	}
 
 	protected function handle_request() {
