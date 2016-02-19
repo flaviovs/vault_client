@@ -53,8 +53,8 @@ class App {
 	}
 
 	protected function init_router() {
-		$this->router->addGet( 'request.submit', '/' );
-		$this->router->addPost( 'request.submit#submission', '/' );
+		$this->router->addGet( 'request', '/' );
+		$this->router->addPost( 'request#submission', '/' );
 	}
 
 	protected function display_page( $title, $contents ) {
@@ -66,7 +66,7 @@ class App {
 	}
 
 
-	protected function handle_request_submit() {
+	protected function handle_request_form() {
 	}
 
 	protected function handle_request() {
@@ -78,12 +78,12 @@ class App {
 
 		switch ( $route->params['action'] ) {
 
-		case 'request.submit':
-			$this->handle_request_submit();
+		case 'request':
+			$this->handle_request_form();
 			break;
 
-		case 'request.submit#submission':
-			$this->handle_request_submit_submission();
+		case 'request#submission':
+			$this->handle_request_form_submission();
 			break;
 
 		default:
