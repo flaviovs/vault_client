@@ -93,6 +93,9 @@ class App {
 	}
 
 	protected function handle_not_found() {
+		$this->response->status->setCode(404);
+		$this->display_page( 'Page not found',
+		                     "Sorry, the page you were looking for doesn't exist or has been moved." );
 	}
 
 	protected function send_response() {
