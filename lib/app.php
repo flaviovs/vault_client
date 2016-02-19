@@ -34,6 +34,12 @@ class App {
 		$this->views = new \UView\Registry( __DIR__ . '/../view' );
 	}
 
+	protected function get_conf( $section, $key, $default = NULL ) {
+		return ( ! empty( $this->conf[ $section ])
+		         && array_key_exists($key, $this->conf[ $section ] ) ) ?
+			$this->conf[ $section ][ $key ] : $default;
+	}
+
 	protected function init_logging() {
 		$handler = new \Monolog\Handler\ErrorLogHandler();
 		$handler->setFormatter(
