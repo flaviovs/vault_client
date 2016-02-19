@@ -57,6 +57,15 @@ class App {
 		$this->router->addPost( 'request.submit#submission', '/' );
 	}
 
+	protected function display_page( $title, $contents ) {
+		$view = $this->views->get('page');
+		$view->set('title', $title);
+		$view->set('contents', $contents);
+
+		$this->response->content->set($view);
+	}
+
+
 	protected function handle_request_submit() {
 	}
 
