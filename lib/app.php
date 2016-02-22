@@ -223,7 +223,7 @@ class App {
 			$this->init_router();
 			$this->handle_request();
 		} catch ( NotFoundException $ex ) {
-			$this->log->addNotice( 'Not found' );
+			$this->log->addNotice( 'Not found (' . $ex->getMessage() . ')' );
 			$this->handle_not_found();
 		}
 
