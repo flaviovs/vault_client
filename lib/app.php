@@ -12,6 +12,7 @@ class App {
 	protected $session;
 	protected $log;
 	protected $views;
+	protected $messages;
 
 	public function __construct($name) {
 
@@ -32,6 +33,9 @@ class App {
 		$this->log = new \Monolog\Logger($name);
 
 		$this->views = new \UView\Registry( __DIR__ . '/../view' );
+
+		$this->messages = new MessageArea();
+
 	}
 
 	protected function get_conf( $section, $key, $default = NULL ) {
@@ -63,8 +67,33 @@ class App {
 		$this->router->addPost( 'request#submission', '/' );
 	}
 
+	protected function flashMessage($msg, $level) {
+		$messages = $this->session->getFlashNext( 'messages', [] );
+		if ( ! array_key_exists($level, $messages) ) {
+			$messages[ $level ] = [];
+		}
+		$messages[ $level ][] = $msg;
+		$this->session->setFlash( 'messages', $messages );
+	}
+
+	protected function flashInfo($msg) {
+		$this->flashMessage( $msg, MessageArea::INFO );
+	}
+
+	protected function flashError($msg) {
+		$this->flashMessage( $msg, MessageArea::ERROR );
+	}
+
 	protected function display_page( $title, $contents ) {
 		$view = $this->views->get('page');
+
+		foreach ( $this->session->getFlash( 'messages', [] ) as $level => $msgs ) {
+			foreach ( $msgs as $msg ) {
+				$this->messages->addMessage( $level, $msg );
+			}
+		}
+
+		$view->set('messages', (string) $this->messages);
 		$view->set('title', $title);
 		$view->set('contents', $contents);
 
