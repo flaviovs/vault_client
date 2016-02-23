@@ -2,6 +2,8 @@
 
 namespace Vault_Client;
 
+class VaultClientException extends \Exception {}
+
 class VaultClient {
 
 	protected $url;
@@ -40,7 +42,7 @@ class VaultClient {
 		curl_close( $ch );
 
 		if ( $error ) {
-			throw new \RuntimeException( $error );
+			throw new VaultClientException( $error );
 		}
 
 		// FIXME: handle JSON decoding errors
