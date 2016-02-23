@@ -50,8 +50,9 @@ class VaultClient {
 	public function add_request( $email, $app_data = NULL, $instructions = NULL ) {
 		return $this->call( 'request',
 		                    [
-			                    'app_data' => $app_data,
+			                    'email' => $email,
 			                    'instructions' => $instructions,
+			                    'app_data' => $app_data,
 		                    ] );
 	}
 }
