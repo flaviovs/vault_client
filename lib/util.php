@@ -8,6 +8,49 @@ class Valid {
 	}
 }
 
+class Mailer extends \PHPMailer {
+	protected $debug;
+	protected $log;
+
+	public function __construct(array $conf, \Monolog\Logger $log) {
+		parent::__construct( TRUE ); // Tell PHPMailer that we want exceptions.
+
+		if ( ! isset( $conf[ 'mailer' ] ) ) {
+			throw new \RuntimeException('No mailer configuration found');
+		}
+
+		$conf = $conf[ 'mailer' ];
+
+		if ( empty( $conf[ 'from_address' ] ) ) {
+			throw new \RuntimeException('Missing from_address mailer configuration');
+		}
+
+		if ( empty( $conf[ 'from_name' ] ) ) {
+			throw new \RuntimeException('Missing from_name mailer configuration');
+		}
+
+		$this->debug = ! empty( $conf[ 'debug' ] );
+
+		if ( $this->debug ) {
+			$this->Mailer = 'debug';
+		}
+
+		$this->setFrom( $conf[ 'from_address' ], $conf[ 'from_name' ] );
+
+		$this->log = $log;
+	}
+
+	protected function debugSend($headers, $body) {
+		$this->log->addDebug('Omitting email to '
+		                     . implode( ',',
+		                                array_keys( $this->all_recipients ) ),
+		                     [
+			                     'headers' => $headers,
+			                     'body' => $body,
+		                     ]);
+		return TRUE;
+	}
+}
 
 class MessageArea {
 	const INFO = 0;

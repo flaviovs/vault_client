@@ -65,7 +65,10 @@ class App {
 	protected function init_router() {
 		$this->router->addGet( 'request', '/' );
 		$this->router->addPost( 'request#submission', '/' );
+		$this->router->addGet( 'confirm', '/confirm' );
+		$this->router->addPost( 'confirm#submission', '/confirm' );
 	}
+
 
 	protected function flashMessage($msg, $level) {
 		$messages = $this->session->getFlashNext( 'messages', [] );
@@ -123,6 +126,17 @@ class App {
 		return $form;
 	}
 
+	protected function get_confirm_token( $timestamp, $req_email,
+	                                      $user_email, $instructions ) {
+		return base64_encode(
+			hash_hmac(
+				'sha1',
+				"$timestamp $req_email $user_email $instructions",
+				$this->get_conf( 'vault', 'secret' ),
+				TRUE
+			) );
+	}
+
 	protected function handle_request_form() {
 		$this->display_page( 'Request a secret', $this->get_request_form() );
 	}
@@ -159,10 +173,85 @@ class App {
 			return;
 		}
 
+		$timestamp = microtime( TRUE );
+
+		$body = $this->views->get( 'email-confirm' );
+		$body->set( 'token', $this->get_confirm_token( $timestamp,
+		                                               $req_email,
+		                                               $user_email,
+		                                               $instructions ) );
+
+		$mailer = new Mailer( $this->conf, $this->log );
+		$mailer->addAddress( $req_email );
+		$mailer->Subject = 'A secret request awaits your confirmation';
+		$mailer->Body = (string) $body;
+
+		$mailer->send();
+
+		$this->session->setFlash( 'timestamp', $timestamp );
+		$this->session->setFlash( 'req_email', $req_email );
+		$this->session->setFlash( 'user_email', $user_email );
+		$this->session->setFlash( 'instructions', $instructions );
+
+		$this->response->redirect->afterPost(
+			$this->router->generate( 'confirm' )
+		);
+	}
+
+	protected function handle_confirm() {
+		$timestamp = $this->session->getFlash( 'timestamp' );
+		$req_email = $this->session->getFlash( 'req_email' );
+		$user_email = $this->session->getFlash( 'user_email' );
+		$instructions = $this->session->getFlash( 'instructions' );
+
+		if ( empty( $timestamp ) || empty( $req_email ) || empty( $user_email ) ) {
+			// Should never happen, but let's stay on the safe side here.
+			throw new NotFoundException( 'Missing session variables' );
+		}
+
+		if ( (time() - $timestamp) < 120 ) {
+			// Keep the request variables in session for at least 2 minutes.
+			$this->session->keepFlash();
+		}
+
+		$form = $this->views->get('confirm');
+
+		$form->set( 'action', $this->router->generate( 'confirm#submission' ) );
+		$form->set( 'timestamp', $timestamp );
+		$form->set( 'req_email', $req_email );
+		$form->set( 'user_email', $user_email );
+		$form->set( 'instructions', $instructions );
+
+		$this->display_page('Confirmation', $form);
+	}
+
+	protected function handle_confirm_submission() {
+		$timestamp = $this->request->post->get( 'timestamp' );
+		$req_email = $this->request->post->get( 'req_email' );
+		$user_email = $this->request->post->get( 'user_email' );
+		$instructions = $this->request->post->get( 'instructions' );
+
+		$token = $this->get_confirm_token( $timestamp,
+		                                   $req_email,
+		                                   $user_email,
+		                                   $instructions );
+
+		if ( ! hash_equals( $this->request->post->get('token'), $token ) ) {
+			$this->session->setFlash( 'timestamp', $timestamp );
+			$this->session->setFlash( 'req_email', $req_email );
+			$this->session->setFlash( 'user_email', $user_email );
+			$this->session->setFlash( 'instructions', $instructions );
+			$this->flashError('The confirmation token is not valid.');
+			$this->response->redirect->afterPost(
+				$this->router->generate( 'confirm' ) );
+			return;
+		}
 
 		$client = $this->new_client();
 
-		$res = $client->add_request($user_email, $req_email, $instructions);
+		$res = $client->add_request( $user_email, $instructions, $req_email );
+
+		print_r($res);
 	}
 
 	protected function handle_request() {
@@ -180,6 +269,14 @@ class App {
 
 		case 'request#submission':
 			$this->handle_request_form_submission();
+			break;
+
+		case 'confirm':
+			$this->handle_confirm();
+			break;
+
+		case 'confirm#submission':
+			$this->handle_confirm_submission();
 			break;
 
 		default:

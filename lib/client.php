@@ -47,7 +47,7 @@ class VaultClient {
 		return json_decode( $res, TRUE );
 	}
 
-	public function add_request( $email, $app_data = NULL, $instructions = NULL ) {
+	public function add_request( $email, $instructions = NULL, $app_data = NULL ) {
 		return $this->call( 'request',
 		                    [
 			                    'email' => $email,
