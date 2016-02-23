@@ -220,7 +220,8 @@ class App {
 		$form->set( 'timestamp', $timestamp );
 		$form->set( 'req_email', $req_email );
 		$form->set( 'user_email', $user_email );
-		$form->set( 'instructions', $instructions );
+		$form->set( 'instructions',
+		            VaultClient::esc_instructions( $instructions ) );
 
 		$this->display_page('Confirmation', $form);
 	}

@@ -12,7 +12,7 @@
 	<th colspan="2">Additional instructions</th>
   </tr>
   <tr>
-	<td colspan="2"><pre><?php echo htmlspecialchars($instructions) ?></pre></td>
+	<td colspan="2"><pre><?php echo $instructions ?></pre></td>
   </tr>
 </table>
 
@@ -20,7 +20,7 @@
   <input type="hidden" name="timestamp" value="<?php echo $timestamp ?>">
   <input type="hidden" name="req_email" value="<?php echo htmlspecialchars($req_email) ?>">
   <input type="hidden" name="user_email" value="<?php echo htmlspecialchars($user_email) ?>">
-  <input type="hidden" name="instructions" value="<?php echo htmlspecialchars($instructions) ?>">
+  <input type="hidden" name="instructions" value="<?php echo $instructions ?>">
 
   <p>Please enter the confirmation token that was sent to your email and hit "Confirm" to confirm the request.</p>
 

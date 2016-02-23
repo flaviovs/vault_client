@@ -10,6 +10,13 @@ class VaultClient {
 	protected $key;
 	protected $secret;
 
+	const INSTRUCTIONS_ALLOWED_TAGS = '<p><br><b><i><strong><em><ul><ol><li>';
+
+	static public function esc_instructions( $instructions ) {
+		return strip_tags( $instructions,
+		                   VaultClient::INSTRUCTIONS_ALLOWED_TAGS );
+	}
+
 	public function __construct( $url, $key, $secret ) {
 		$this->url = $url;
 		$this->key = $key;
