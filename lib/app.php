@@ -295,7 +295,7 @@ class App {
 			break;
 
 		default:
-			$this->log->addNotice("Unsupported ping subject '$subject')");
+			throw new NotFoundException("Unsupported ping subject '$subject'");
 		}
 	}
 
