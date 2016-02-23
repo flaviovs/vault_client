@@ -67,6 +67,7 @@ class App {
 		$this->router->addPost( 'request#submission', '/' );
 		$this->router->addGet( 'confirm', '/confirm' );
 		$this->router->addPost( 'confirm#submission', '/confirm' );
+		$this->router->addPost( 'ping', '/ping' );
 	}
 
 
@@ -258,6 +259,46 @@ class App {
 			$this->router->generate( 'request' ) );
 	}
 
+	protected function handle_ping_submission( array $args ) {
+
+		$body = $this->views->get('email-unlock');
+		$body->set( 'reqid', $args[ 'reqid' ] );
+		$body->set( 'unlock_url', $args[ 'unlock_url' ] );
+		$body->set( 'unlock_key', $args[ 'unlock_key' ] );
+
+		$mailer = new Mailer( $this->conf, $this->log );
+		$mailer->addAddress( $args[ 'app_data' ] );
+		$mailer->Subject = 'The information you requested is now available';
+		$mailer->Body = (string) $body;
+
+		$mailer->send();
+
+	}
+
+	protected function handle_ping() {
+		$subject = $this->request->post->get('s');
+		$payload = $this->request->post->get('p');
+		$mac = $this->request->post->get('m');
+
+		$known_mac = hash_hmac( 'sha1',  "$subject $payload",
+		                        $this->get_conf( 'vault', 'vault_secret' ),
+		                        TRUE );
+		if ( ! hash_equals( $known_mac, $mac ) ) {
+			throw new NotFoundException( 'Invalid ping data' );
+		}
+
+		$args = json_decode( $payload, TRUE );
+
+		switch ( $subject ) {
+		case 'submission':
+			$this->handle_ping_submission( $args );
+			break;
+
+		default:
+			$this->log->addNotice("Unsupported ping subject '$subject')");
+		}
+	}
+
 	protected function handle_request() {
 		$path = $this->request->url->get( PHP_URL_PATH );
 		$route = $this->router->match( $path, $this->request->server->get() );
@@ -281,6 +322,10 @@ class App {
 
 		case 'confirm#submission':
 			$this->handle_confirm_submission();
+			break;
+
+		case 'ping':
+			$this->handle_ping();
 			break;
 
 		default:
