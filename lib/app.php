@@ -251,7 +251,10 @@ class App {
 
 		$res = $client->add_request( $user_email, $instructions, $req_email );
 
-		print_r($res);
+		$this->flashInfo('<p>The request was registered, and an e-mail sent to the user.</p><p>You will receive an e-mail when the user submits the information you requested.</p>');
+
+		$this->response->redirect->afterPost(
+			$this->router->generate( 'request' ) );
 	}
 
 	protected function handle_request() {
