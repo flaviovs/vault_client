@@ -43,7 +43,8 @@ class VaultClient {
 			throw new \RuntimeException( $error );
 		}
 
-		return json_decode($res);
+		// FIXME: handle JSON decoding errors
+		return json_decode( $res, TRUE );
 	}
 
 	public function add_request( $email, $app_data = NULL, $instructions = NULL ) {
