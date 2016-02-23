@@ -16,26 +16,20 @@ class VaultClient {
 
 	protected function call( $name, array $args ) {
 
-		$args_json = json_encode($args);
-		$timestamp = time();
-
-		$postdata = [
-			'n' => $name,
-			'a' => $args_json,
-		];
-
 		$ch = curl_init();
 
-		curl_setopt( $ch, CURLOPT_URL, $this->url . "/request" );
+		curl_setopt( $ch, CURLOPT_URL, $this->url . "/" . $name);
 		curl_setopt( $ch, CURLOPT_POST, TRUE );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, 30 );
 		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
 		curl_setopt( $ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
-		curl_setopt( $ch, CURLOPT_POSTFIELDS, $postdata );
+		curl_setopt( $ch, CURLOPT_POSTFIELDS, $args );
 		curl_setopt( $ch, CURLOPT_USERPWD, $this->key . ':' . $this->secret );
 
+		$res = curl_exec( $ch );
+
 		$error = NULL;
-		if ( curl_exec( $ch ) ) {
+		if ( $res ) {
 			$code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
 			if ( $code != 200 ) {
 				$error = "$this->url returned HTTP $code";
