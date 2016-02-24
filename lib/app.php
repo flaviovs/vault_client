@@ -67,8 +67,10 @@ class App {
 	}
 
 	protected function handle_exception( \Exception $ex ) {
-		$this->log->addError( $ex );
-		echo "oops";
+		$this->response->status->setCode( 500 );
+		$this->log->addError( $ex->getMessage(), [ 'exception' => $ex ] );
+		$view = $this->views->get( 'exception' );
+		$this->display_page( __( 'Oops..'), $view );
 	}
 
 	protected function init_router() {
@@ -521,6 +523,8 @@ class App {
 		} catch ( ForbiddenException $ex ) {
 			$this->log->addNotice( 'Forbidden' );
 			$this->handle_forbidden();
+		} catch ( \Exception $ex ) {
+			$this->handle_exception( $ex );
 		}
 
 		$this->prepare_response();
