@@ -2,6 +2,7 @@
 
 namespace Vault_Client;
 
+class ForbiddenException extends \Exception {}
 class NotFoundException extends \Exception {}
 
 class App {
@@ -358,6 +359,11 @@ class App {
 		                     __( "Sorry, the page you were looking for doesn't exist or has been moved." ) );
 	}
 
+	protected function handle_forbidden() {
+		$this->response->status->setCode(403);
+		$this->session->setFlashNow( 'messages', [] );
+	}
+
 	protected function prepare_response() {
 		$type = $this->response->content->getType();
 		$charset = $this->response->content->getCharset();
@@ -397,6 +403,9 @@ class App {
 		} catch ( NotFoundException $ex ) {
 			$this->log->addNotice( 'Not found (' . $ex->getMessage() . ')' );
 			$this->handle_not_found();
+		} catch ( ForbiddenException $ex ) {
+			$this->log->addNotice( 'Forbidden' );
+			$this->handle_forbidden();
 		}
 
 		$this->prepare_response();
