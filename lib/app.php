@@ -137,7 +137,7 @@ class App {
 			hash_hmac(
 				'sha1',
 				"$timestamp $req_email $user_email $instructions",
-				$this->get_conf( 'vault', 'secret' ),
+				$this->get_conf( 'api', 'secret' ),
 				TRUE
 			) );
 	}
@@ -285,7 +285,7 @@ class App {
 		$mac = $this->request->post->get('m');
 
 		$known_mac = hash_hmac( 'sha1',  "$subject $payload",
-		                        $this->get_conf( 'vault', 'vault_secret' ),
+		                        $this->get_conf( 'api', 'vault_secret' ),
 		                        TRUE );
 		if ( ! hash_equals( $known_mac, $mac ) ) {
 			throw new NotFoundException( 'Invalid ping data' );
