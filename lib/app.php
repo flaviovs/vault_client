@@ -24,6 +24,9 @@ class App {
 		$this->request = $web_factory->newRequest();
 		$this->response = $web_factory->newResponse();
 
+		$this->response->content->setType( 'text/html' );
+		$this->response->content->setCharset( 'utf-8' );
+
 		$router_factory = new \Aura\Router\RouterFactory();
 		$this->router = $router_factory->newInstance();
 
@@ -344,6 +347,14 @@ class App {
 		                     "Sorry, the page you were looking for doesn't exist or has been moved." );
 	}
 
+	protected function prepare_response() {
+		$type = $this->response->content->getType();
+		$charset = $this->response->content->getCharset();
+
+		$this->response->headers->set( 'Content-Type',
+									   "$type; charset=\"$charset\"" );
+	}
+
 	protected function send_response() {
 		header( $this->response->status->get(),
 		        true,
@@ -377,6 +388,7 @@ class App {
 			$this->handle_not_found();
 		}
 
+		$this->prepare_response();
 		$this->send_response();
 	}
 }
