@@ -105,18 +105,18 @@ class App {
 	}
 
 	protected function new_client() {
-		$url = $this->get_conf('vault', 'url');
-		$key = $this->get_conf('vault', 'key');
-		$secret = $this->get_conf('vault', 'secret');
+		$url = $this->get_conf('api', 'url');
+		$key = $this->get_conf('api', 'key');
+		$secret = $this->get_conf('api', 'secret');
 
 		if ( !$url ) {
-			throw new \RuntimeException( 'No Vault URL in config.ini' );
+			throw new \RuntimeException( 'No API URL in config.ini' );
 		}
 		if ( !$key ) {
-			throw new \RuntimeException( 'No Vault key in config.ini' );
+			throw new \RuntimeException( 'No API key in config.ini' );
 		}
 		if ( !$secret ) {
-			throw new \RuntimeException( 'No Vault secret in config.ini' );
+			throw new \RuntimeException( 'No API secret in config.ini' );
 		}
 
 		return new VaultClient($url, $key, $secret);
