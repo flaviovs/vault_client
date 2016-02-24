@@ -215,7 +215,10 @@ class App {
 
 		if ( empty( $timestamp ) || empty( $req_email ) || empty( $user_email ) ) {
 			// Should never happen, but let's stay on the safe side here.
-			throw new NotFoundException( 'Missing session variables' );
+			$this->log->addNotice( 'Invalid session state' );
+			$this->response->redirect->to(
+				$this->router->generate( 'request' ) );
+			return;
 		}
 
 		if ( (time() - $timestamp) < 120 ) {
