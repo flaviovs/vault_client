@@ -187,6 +187,7 @@ class App {
 	}
 
 	protected function log_in( User $user ) {
+		$this->root_session->regenerateId();
 		$this->log->addInfo( $user->email . ' logged in' );
 		$this->session->set( 'user', $user );
 		$this->user = $user;
@@ -409,6 +410,7 @@ class App {
 
 	protected function handle_logout() {
 		$this->session->set( 'user', NULL );
+		$this->root_session->regenerateId();
 		$this->flashInfo( __( 'You have successfully logged out.') );
 		$this->response->redirect->to( $this->router->generate( 'request' ) );
 	}
