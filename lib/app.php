@@ -145,6 +145,8 @@ class App {
 
 	protected function get_request_form() {
 		$form = $this->views->get( 'request-form' );
+		$form->set( 'form_token',
+		            $this->root_session->getCsrfToken()->getValue() );
 		$form->set( 'req_email', $this->user->email );
 		return $form;
 	}
@@ -259,7 +261,16 @@ class App {
 		                     $this->get_request_form() );
 	}
 
+	protected function check_form_token() {
+		$form_token = $this->request->post->get( 'form_token' );
+		if ( ! $this->root_session->getCsrfToken()->isValid( $form_token ) ) {
+			throw new \RuntimeException( 'Invalid form token. CSRF attempt?' );
+		}
+	}
+
 	protected function handle_request_form_submission() {
+		$this->check_form_token();
+
 		$user_email = $this->request->post->get( 'user-email' );
 		$instructions = $this->request->post->get( 'instructions' );
 
@@ -326,6 +337,9 @@ class App {
 		}
 
 		$form = $this->views->get('confirm');
+		$form->set( 'form_token',
+		            $this->root_session->getCsrfToken()->getValue() );
+
 
 		$form->set( 'action', $this->router->generate( 'confirm#submission' ) );
 		$form->set( 'req_email', $this->user->email );
@@ -338,6 +352,8 @@ class App {
 	}
 
 	protected function handle_confirm_submission() {
+		$this->check_form_token();
+
 		$timestamp = $this->request->post->get( 'timestamp' );
 		$user_email = $this->request->post->get( 'user_email' );
 		$instructions = $this->request->post->get( 'instructions' );

@@ -17,6 +17,7 @@
 </table>
 
 <form method="POST" action="<?php echo $action ?>">
+  <input type="hidden" name="form_token" value="<?php echo htmlspecialchars($form_token) ?>">
   <input type="hidden" name="timestamp" value="<?php echo $timestamp ?>">
   <input type="hidden" name="req_email" value="<?php echo htmlspecialchars($req_email) ?>">
   <input type="hidden" name="user_email" value="<?php echo htmlspecialchars($user_email) ?>">

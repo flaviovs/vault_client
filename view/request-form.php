@@ -6,6 +6,7 @@
 </ul>
 
 <form method="POST" action="/">
+  <input type="hidden" name="form_token" value="<?php echo htmlspecialchars($form_token) ?>">
   <div id="element-req-email" class="form-group">
 	<label for="req-email">Your e-mail address</label>
 	<input type="email" name="disabled-req-email" value="<?php echo htmlspecialchars($req_email) ?>" disabled class="input-text">
