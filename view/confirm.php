@@ -25,7 +25,7 @@
   <p>A confirmation token was just sent to your e-mail address. Please copy and paste it below. Hit "Confirm" to confirm the request.</p>
 
   <div class="form-group">
-	<input type="text" name="token" value="" required class="input-text" placeholder="Paste the input token here..." autocomplete="off">
+	<input type="text" name="token" value="" required class="input-text" placeholder="Paste the confirmation token here..." autocomplete="off">
   </div>
   <input type="submit" value="Confirm">
 </form>
