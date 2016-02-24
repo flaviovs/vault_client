@@ -1,4 +1,9 @@
-<p>Use this form to request sensitive information from an user.</p>
+<p>Use this form to securely receive information from an user:</p>
+
+<ul>
+  <li>The user will receive an e-mail with an URL, where he or she may input the information requested.</li>
+  <li>You will receive a notification when the user submit the information. You will also receive an URL and a key, that can be used to access and unlock the information provided.</li>
+</ul>
 
 <form method="POST" action="/">
 

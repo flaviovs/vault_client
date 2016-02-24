@@ -146,7 +146,7 @@ class App {
 	}
 
 	protected function handle_request_form() {
-		$this->display_page( __( 'Request a secret' ),
+		$this->display_page( __( 'Send a Vault Request' ),
 		                     $this->get_request_form() );
 	}
 
@@ -178,7 +178,7 @@ class App {
 			            isset( $errors[ 'user_email' ] ) ?
 			            $errors[ 'user_email' ] : NULL );
 
-			$this->display_page( __( 'Request a secret' ), $form );
+			$this->display_page( __( 'Send a Vault Request' ), $form );
 			return;
 		}
 
@@ -235,7 +235,7 @@ class App {
 		$form->set( 'instructions',
 		            VaultClient::esc_instructions( $instructions ) );
 
-		$this->display_page( __( 'Confirmation' ), $form );
+		$this->display_page( __( 'Request Confirmation' ), $form );
 	}
 
 	protected function handle_confirm_submission() {
@@ -264,7 +264,7 @@ class App {
 
 		$res = $client->add_request( $user_email, $instructions, $req_email );
 
-		$this->flashInfo( __( '<p>The request was registered, and an e-mail sent to the user.</p><p>You will receive an e-mail when the user submits the information you requested.</p>' ) );
+		$this->flashInfo( __( '<p>The request was sent.</p><p>You will receive an e-mail when the user submits the information requested.</p>' ) );
 
 		$this->response->redirect->afterPost(
 			$this->router->generate( 'request' ) );

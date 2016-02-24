@@ -22,7 +22,7 @@
   <input type="hidden" name="user_email" value="<?php echo htmlspecialchars($user_email) ?>">
   <input type="hidden" name="instructions" value="<?php echo $instructions ?>">
 
-  <p>Please enter the confirmation token that was sent to your address and hit "Confirm" to confirm the request.</p>
+  <p>A confirmation token was just sent to your e-mail address. Please copy and paste it below. Hit "Confirm" to confirm the request.</p>
 
   <div class="form-group">
 	<input type="text" name="token" value="" required class="input-text" placeholder="Paste the input token here..." autocomplete="off">
