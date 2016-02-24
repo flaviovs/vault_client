@@ -136,13 +136,19 @@ class App {
 
 	protected function get_confirm_token( $timestamp, $req_email,
 	                                      $user_email, $instructions ) {
-		return base64_encode(
-			hash_hmac(
-				'sha1',
-				"$timestamp $req_email $user_email $instructions",
-				$this->get_conf( 'api', 'secret' ),
-				TRUE
-			) );
+		return strtr(
+			base64_encode(
+				hash_hmac(
+					'sha1',
+					"$timestamp $req_email $user_email $instructions",
+					$this->get_conf( 'api', 'secret' ),
+					TRUE
+				) ),
+			[
+				'+' => '-',
+				'/' => '.',
+				'=' => '',
+			]);
 	}
 
 	protected function handle_request_form() {
