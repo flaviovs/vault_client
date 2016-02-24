@@ -146,7 +146,8 @@ class App {
 	}
 
 	protected function handle_request_form() {
-		$this->display_page( 'Request a secret', $this->get_request_form() );
+		$this->display_page( __( 'Request a secret' ),
+		                     $this->get_request_form() );
 	}
 
 	protected function handle_request_form_submission() {
@@ -177,7 +178,7 @@ class App {
 			            isset( $errors[ 'user_email' ] ) ?
 			            $errors[ 'user_email' ] : NULL );
 
-			$this->display_page( 'Request a secret', $form );
+			$this->display_page( __( 'Request a secret' ), $form );
 			return;
 		}
 
@@ -231,7 +232,7 @@ class App {
 		$form->set( 'instructions',
 		            VaultClient::esc_instructions( $instructions ) );
 
-		$this->display_page('Confirmation', $form);
+		$this->display_page( __( 'Confirmation' ), $form );
 	}
 
 	protected function handle_confirm_submission() {
@@ -250,7 +251,7 @@ class App {
 			$this->session->setFlash( 'req_email', $req_email );
 			$this->session->setFlash( 'user_email', $user_email );
 			$this->session->setFlash( 'instructions', $instructions );
-			$this->flashError('The confirmation token is not valid.');
+			$this->flashError( __( 'The confirmation token you entered is not valid.' ) );
 			$this->response->redirect->afterPost(
 				$this->router->generate( 'confirm' ) );
 			return;
@@ -260,7 +261,7 @@ class App {
 
 		$res = $client->add_request( $user_email, $instructions, $req_email );
 
-		$this->flashInfo('<p>The request was registered, and an e-mail sent to the user.</p><p>You will receive an e-mail when the user submits the information you requested.</p>');
+		$this->flashInfo( __( '<p>The request was registered, and an e-mail sent to the user.</p><p>You will receive an e-mail when the user submits the information you requested.</p>' ) );
 
 		$this->response->redirect->afterPost(
 			$this->router->generate( 'request' ) );
@@ -343,8 +344,8 @@ class App {
 
 	protected function handle_not_found() {
 		$this->response->status->setCode(404);
-		$this->display_page( 'Page not found',
-		                     "Sorry, the page you were looking for doesn't exist or has been moved." );
+		$this->display_page( __( 'Page not found' ),
+		                     __( "Sorry, the page you were looking for doesn't exist or has been moved." ) );
 	}
 
 	protected function prepare_response() {
