@@ -144,6 +144,7 @@ class App {
 
 	protected function get_request_form() {
 		$form = $this->views->get( 'request-form' );
+		$form->set( 'req_email', $this->user->email );
 		return $form;
 	}
 
@@ -257,14 +258,10 @@ class App {
 	}
 
 	protected function handle_request_form_submission() {
-		$req_email = $this->request->post->get( 'req-email' );
 		$user_email = $this->request->post->get( 'user-email' );
 		$instructions = $this->request->post->get( 'instructions' );
 
 		$errors = [];
-		if ( empty( $req_email) || ! Valid::email( $req_email ) ) {
-			$errors[ 'req_email' ] = 'Input a valid e-mail address.';
-		}
 
 		if ( empty( $user_email) || ! Valid::email( $user_email ) ) {
 			$errors[ 'user_email' ] = 'Input a valid e-mail address.';
@@ -273,13 +270,9 @@ class App {
 		if ( $errors ) {
 			$form = $this->get_request_form();
 
-			$form->set( 'req_email', $req_email );
 			$form->set( 'user_email', $user_email );
 			$form->set( 'instructions', $instructions );
 
-			$form->set( 'req_email_error',
-			            isset( $errors[ 'req_email' ] ) ?
-			            $errors[ 'req_email' ] : NULL );
 			$form->set( 'user_email_error',
 			            isset( $errors[ 'user_email' ] ) ?
 			            $errors[ 'user_email' ] : NULL );
@@ -292,19 +285,18 @@ class App {
 
 		$body = $this->views->get( 'email-confirm' );
 		$body->set( 'token', $this->get_confirm_token( $timestamp,
-		                                               $req_email,
+		                                               $this->user->email,
 		                                               $user_email,
 		                                               $instructions ) );
 
 		$mailer = new Mailer( $this->conf, $this->log );
-		$mailer->addAddress( $req_email );
+		$mailer->addAddress( $this->user->email );
 		$mailer->Subject = 'A Vault request awaits your confirmation';
 		$mailer->Body = (string) $body;
 
 		$mailer->send();
 
 		$this->session->setFlash( 'timestamp', $timestamp );
-		$this->session->setFlash( 'req_email', $req_email );
 		$this->session->setFlash( 'user_email', $user_email );
 		$this->session->setFlash( 'instructions', $instructions );
 
@@ -315,11 +307,10 @@ class App {
 
 	protected function handle_confirm() {
 		$timestamp = $this->session->getFlash( 'timestamp' );
-		$req_email = $this->session->getFlash( 'req_email' );
 		$user_email = $this->session->getFlash( 'user_email' );
 		$instructions = $this->session->getFlash( 'instructions' );
 
-		if ( empty( $timestamp ) || empty( $req_email ) || empty( $user_email ) ) {
+		if ( empty( $timestamp ) || empty( $user_email ) ) {
 			// Should never happen, but let's stay on the safe side here.
 			$this->log->addNotice( 'Invalid session state' );
 			$this->response->redirect->to(
@@ -335,8 +326,8 @@ class App {
 		$form = $this->views->get('confirm');
 
 		$form->set( 'action', $this->router->generate( 'confirm#submission' ) );
+		$form->set( 'req_email', $this->user->email );
 		$form->set( 'timestamp', $timestamp );
-		$form->set( 'req_email', $req_email );
 		$form->set( 'user_email', $user_email );
 		$form->set( 'instructions',
 		            VaultClient::esc_instructions( $instructions ) );
@@ -346,18 +337,16 @@ class App {
 
 	protected function handle_confirm_submission() {
 		$timestamp = $this->request->post->get( 'timestamp' );
-		$req_email = $this->request->post->get( 'req_email' );
 		$user_email = $this->request->post->get( 'user_email' );
 		$instructions = $this->request->post->get( 'instructions' );
 
 		$token = $this->get_confirm_token( $timestamp,
-		                                   $req_email,
+		                                   $this->user->email,
 		                                   $user_email,
 		                                   $instructions );
 
 		if ( ! hash_equals( $this->request->post->get('token'), $token ) ) {
 			$this->session->setFlash( 'timestamp', $timestamp );
-			$this->session->setFlash( 'req_email', $req_email );
 			$this->session->setFlash( 'user_email', $user_email );
 			$this->session->setFlash( 'instructions', $instructions );
 			$this->flashError( __( 'The confirmation token you entered is not valid.' ) );
@@ -368,7 +357,8 @@ class App {
 
 		$client = $this->new_client();
 
-		$res = $client->add_request( $user_email, $instructions, $req_email );
+		$res = $client->add_request( $user_email, $instructions,
+		                             $this->user->email );
 
 		$this->flashInfo( __( '<p>The request was sent.</p><p>You will receive an e-mail when the user submits the information requested.</p>' ) );
 

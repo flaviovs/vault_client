@@ -6,13 +6,9 @@
 </ul>
 
 <form method="POST" action="/">
-
-  <div id="element-req-email" class="form-group<?php echo empty($req_email_error) ? '' : ' error' ?>">
+  <div id="element-req-email" class="form-group">
 	<label for="req-email">Your e-mail address</label>
-	<input type="email" name="req-email" value="<?php echo htmlspecialchars($req_email) ?>" required class="input-text">
-	<?php if ( ! empty($req_email_error) ): ?>
-	<div class="error"><?php echo $req_email_error ?></div>
-	<?php endif ?>
+	<input type="email" name="disabled-req-email" value="<?php echo htmlspecialchars($req_email) ?>" disabled class="input-text">
   </div>
 
   <div id="element-user-email" class="form-group<?php echo empty($user_email_error) ? '' : ' error' ?>">
