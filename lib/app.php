@@ -347,6 +347,7 @@ class App {
 
 	protected function handle_not_found() {
 		$this->response->status->setCode(404);
+		$this->session->setFlashNow( 'messages', [] );
 		$this->display_page( __( 'Page not found' ),
 		                     __( "Sorry, the page you were looking for doesn't exist or has been moved." ) );
 	}
