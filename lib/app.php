@@ -149,11 +149,11 @@ class App {
 
 		$errors = [];
 		if ( empty( $req_email) || ! Valid::email( $req_email ) ) {
-			$errors[ 'req_email' ] = 'You need to provide a valid e-mail address.';
+			$errors[ 'req_email' ] = 'Input a valid e-mail address.';
 		}
 
 		if ( empty( $user_email) || ! Valid::email( $user_email ) ) {
-			$errors[ 'user_email' ] = 'You need to provide a valid e-mail address.';
+			$errors[ 'user_email' ] = 'Input a valid e-mail address.';
 		}
 
 		if ( $errors ) {

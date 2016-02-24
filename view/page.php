@@ -2,6 +2,7 @@
 <html>
   <head>
 	<title><?php echo $title ?></title>
+	<link rel="stylesheet" href="/css/main.css?1">
   </head>
   <body>
 	<main>
