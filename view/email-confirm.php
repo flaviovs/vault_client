@@ -6,5 +6,6 @@ the confirmation form:
 
   <?php echo $token ?>
 
+
 -- 
 The Vault
