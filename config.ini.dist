@@ -5,6 +5,13 @@ key = ?
 secret = ?
 vault_secret = ?
 
+[oauth]
+client_id = ?
+client_secret = ?
+redirect_url = "<BASE-URL>/auth"
+request_token_url = "https://public-api.wordpress.com/oauth2/token"
+authenticate_url = "https://public-api.wordpress.com/oauth2/authenticate"
+
 [mailer]
 from_address = unconfigured@example.com
 from_name = Vault

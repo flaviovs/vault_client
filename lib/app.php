@@ -14,6 +14,7 @@ class App {
 	protected $log;
 	protected $views;
 	protected $messages;
+	protected $user;
 
 	public function __construct($name) {
 		// Workaround '_SERVER' not present in $GLOBALS, unless
@@ -75,7 +76,15 @@ class App {
 		$this->router->addPost( 'request#submission', '/' );
 		$this->router->addGet( 'confirm', '/confirm' );
 		$this->router->addPost( 'confirm#submission', '/confirm' );
-		$this->router->addPost( 'ping', '/ping' );
+		$this->router->addGet( 'logout', '/logout' );
+
+		// We do not require a user to be logged in on the following
+		// paths
+		$this->router->addPost( 'ping', '/ping' )
+			->addValues(  [ '_skip_login_check' => TRUE ] );
+
+		$this->router->addGet( 'auth', '/auth' )
+			->addValues( [ '_skip_login_check' => TRUE ] );
 	}
 
 
@@ -108,6 +117,7 @@ class App {
 		$view->set('messages', (string) $this->messages);
 		$view->set('title', $title);
 		$view->set('contents', $contents);
+		$view->set('user', $this->user);
 
 		$this->response->content->set($view);
 	}
@@ -150,6 +160,93 @@ class App {
 				'/' => '.',
 				'=' => '',
 			]);
+	}
+
+	protected function display_login_page() {
+		$wpcc_state = base64_encode( openssl_random_pseudo_bytes( 16 ) );
+		$this->session->setFlash( 'wpcc_state', $wpcc_state );
+
+		$url_to = $this->get_conf( 'oauth', 'authenticate_url' )
+			. '?'
+			. http_build_query(
+				[
+					'response_type' => 'code',
+					'client_id' => $this->get_conf( 'oauth',
+					                                'client_id' ),
+					'state' => $wpcc_state,
+					'redirect_uri' => $this->get_conf( 'oauth',
+					                                   'redirect_url' ),
+				] );
+
+		$this->display_page( __( 'Vault log in' ),
+		                     '<a id="login-button" href="' . $url_to . '"><img src="//s0.wp.com/i/wpcc-button.png" width="231"></a>' );
+	}
+
+	protected function log_in( User $user ) {
+		$this->log->addInfo( $user->email . ' logged in' );
+		$this->session->set( 'user', $user );
+		$this->user = $user;
+	}
+
+	protected function handle_auth() {
+
+		// No matter what, we always redirect to the request page
+		$this->response->redirect->to( $this->router->generate( 'request' ) );
+
+		$code = $this->request->query->get( 'code' );
+		if ( ! $code ) {
+			$this->flashError( __( 'You must login to access this system.' ) );
+			return;
+		}
+
+		if ( ! hash_equals( $this->session->getFlash( 'wpcc_state' ), $this->request->query->get( 'state' ) ) ) {
+			$this->flashError( __( 'Invalid request.' ) );
+			return;
+		}
+
+		$postfields = [
+			'client_id' => $this->get_conf( 'oauth', 'client_id' ),
+			'redirect_uri' => $this->get_conf( 'oauth', 'redirect_url' ),
+			'client_secret' => $this->get_conf( 'oauth', 'client_secret' ),
+			'code' => $code,
+			'grant_type' => 'authorization_code'
+		];
+
+		$ch = curl_init( $this->get_conf( 'oauth', 'request_token_url' ) );
+		curl_setopt( $ch, CURLOPT_POST, TRUE );
+		curl_setopt( $ch, CURLOPT_POSTFIELDS, $postfields );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
+		$auth = curl_exec( $ch );
+
+		$secret = json_decode( $auth, TRUE );
+
+		if ( empty( $secret[ 'access_token' ] ) ) {
+			throw new \RuntimeException( 'No access token was returned from OAauth' );
+		}
+
+		$ch = curl_init( 'https://public-api.wordpress.com/rest/v1/me/' );
+		curl_setopt( $ch, CURLOPT_HTTPHEADER,
+		             [ 'Authorization: Bearer ' . $secret[ 'access_token' ] ] );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
+		$res = curl_exec( $ch );
+		$user = json_decode( $res, TRUE );
+
+		if ( empty( $user[ 'verified' ] ) ) {
+			$this->flashError( __('You need to verify your e-mail in WordPress.com before logging in here.') );
+			return;
+		}
+
+		$this->log_in( new User( $user[ 'ID' ],
+		                         $user[ 'email' ],
+		                         $user[ 'display_name' ] ) );
+	}
+
+	protected function check_user() {
+		$this->user = $this->session->get( 'user' );
+		if ( ! $this->user ) {
+			$this->display_login_page();
+			throw new ForbiddenException();
+		}
 	}
 
 	protected function handle_request_form() {
@@ -317,6 +414,12 @@ class App {
 		}
 	}
 
+	protected function handle_logout() {
+		$this->session->set( 'user', NULL );
+		$this->flashInfo( __( 'You have successfully logged out.') );
+		$this->response->redirect->to( $this->router->generate( 'request' ) );
+	}
+
 	protected function handle_request() {
 		$path = $this->request->url->get( PHP_URL_PATH );
 		$route = $this->router->match( $path, $this->request->server->get() );
@@ -324,7 +427,15 @@ class App {
 			throw new NotFoundException($path);
 		}
 
+		if ( empty( $route->params[ '_skip_login_check' ] ) ) {
+			$this->check_user();
+		}
+
 		switch ( $route->params['action'] ) {
+
+		case 'auth':
+			$this->handle_auth();
+			break;
 
 		case 'request':
 			$this->handle_request_form();
@@ -344,6 +455,10 @@ class App {
 
 		case 'ping':
 			$this->handle_ping();
+			break;
+
+		case 'logout':
+			$this->handle_logout();
 			break;
 
 		default:

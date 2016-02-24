@@ -108,3 +108,28 @@ aside#messages {
 	background-color: #fff8f8;
 	border-left: 10px solid #f00;
 }
+
+header {
+	text-align: right;
+	border-bottom: 1px solid #ccc;
+	margin-bottom: 20px;
+	padding-bottom: 20px;
+}
+
+header #welcome {
+	display: inline;
+}
+
+header nav {
+	display: inline;
+	border-left: 1px solid #ccc;
+	padding-left: 10px;
+	margin-left: 10px;
+}
+
+
+#login-button {
+	width: 231px;
+	display: block;
+	margin: 0 auto;
+}
