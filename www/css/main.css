@@ -92,6 +92,10 @@ table tr {
 	border-bottom: 1px solid #ccc;
 }
 
+aside#messages {
+	margin-bottom: 1em;
+}
+
 #messages > div {
 	padding: 10px 15px;
 }
