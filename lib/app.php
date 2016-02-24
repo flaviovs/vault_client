@@ -15,6 +15,10 @@ class App {
 	protected $messages;
 
 	public function __construct($name) {
+		// Workaround '_SERVER' not present in $GLOBALS, unless
+		// referenced before (see
+		// https://bugs.php.net/bug.php?id=65223).
+		$_SERVER;
 
 		$web_factory = new \Aura\Web\WebFactory( $GLOBALS );
 		$this->request = $web_factory->newRequest();
