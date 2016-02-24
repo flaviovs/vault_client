@@ -198,7 +198,7 @@ class App {
 
 		$mailer = new Mailer( $this->conf, $this->log );
 		$mailer->addAddress( $req_email );
-		$mailer->Subject = 'A secret request awaits your confirmation';
+		$mailer->Subject = 'A Vault request awaits your confirmation';
 		$mailer->Body = (string) $body;
 
 		$mailer->send();
