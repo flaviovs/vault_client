@@ -288,7 +288,7 @@ class App {
 		                        $this->get_conf( 'api', 'vault_secret' ),
 		                        TRUE );
 		if ( ! hash_equals( $known_mac, $mac ) ) {
-			throw new NotFoundException( 'Invalid ping data' );
+			throw new NotFoundException( 'Could not authenticate ping' );
 		}
 
 		$args = json_decode( $payload, TRUE );
