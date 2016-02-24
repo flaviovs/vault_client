@@ -10,6 +10,7 @@ class App {
 	protected $response;
 	protected $router;
 	protected $conf;
+	protected $root_session;
 	protected $session;
 	protected $log;
 	protected $views;
@@ -35,9 +36,9 @@ class App {
 		$this->conf = [];
 
 		$session_factory = new \Aura\Session\SessionFactory;
-		$session = $session_factory->newInstance(
+		$this->root_session = $session_factory->newInstance(
 			$this->request->cookies->get() );
-		$this->session = $session->getSegment( __CLASS__ );
+		$this->session = $this->root_session->getSegment( __CLASS__ );
 
 		$this->log = new \Monolog\Logger($name);
 
