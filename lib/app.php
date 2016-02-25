@@ -496,6 +496,10 @@ class App {
 
 		$this->response->headers->set( 'Content-Type',
 									   "$type; charset=\"$charset\"" );
+
+		if ( $this->user ) {
+			$this->response->cache->setPrivate();
+		}
 	}
 
 	protected function send_response() {
