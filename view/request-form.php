@@ -26,5 +26,5 @@
 	<div class="help">You can use basic HTML like &lt;b&gt;, &lt;i&gt;, and HTML lists.</div>
 
   </div>
-  <input type="submit" value="Request">
+  <input type="submit" value="Send Request">
 </form>
