@@ -27,20 +27,20 @@ class VaultClient {
 
 		$ch = curl_init();
 
-		curl_setopt( $ch, CURLOPT_URL, $this->url . "/" . $name);
-		curl_setopt( $ch, CURLOPT_POST, TRUE );
+		curl_setopt( $ch, CURLOPT_URL, $this->url . '/' . $name );
+		curl_setopt( $ch, CURLOPT_POST, true );
 		curl_setopt( $ch, CURLOPT_TIMEOUT, 30 );
-		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, TRUE );
+		curl_setopt( $ch, CURLOPT_RETURNTRANSFER, true );
 		curl_setopt( $ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC );
 		curl_setopt( $ch, CURLOPT_POSTFIELDS, $args );
 		curl_setopt( $ch, CURLOPT_USERPWD, $this->key . ':' . $this->secret );
 
 		$res = curl_exec( $ch );
 
-		$error = NULL;
+		$error = null;
 		if ( $res ) {
 			$code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
-			if ( $code != 200 ) {
+			if ( 200 != $code ) {
 				$error = "$this->url returned HTTP $code";
 			}
 		} else {
@@ -53,10 +53,10 @@ class VaultClient {
 		}
 
 		// FIXME: handle JSON decoding errors
-		return json_decode( $res, TRUE );
+		return json_decode( $res, true );
 	}
 
-	public function add_request( $email, $instructions = NULL, $app_data = NULL ) {
+	public function add_request( $email, $instructions = null, $app_data = null ) {
 		return $this->call( 'request',
 		                    [
 			                    'email' => $email,
