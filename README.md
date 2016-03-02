@@ -3,7 +3,7 @@ The Vault reference client app
 
 This is the reference client for the Vault system. It allows one to
 setup a system to securely exchange secret information (such as
-passwords, API keys, etc.) between two parties (e.g., an Hapinness
+passwords, API keys, etc.) between two parties (e.g., an Happiness
 Engineer and a support user).
 
 This app is only a thin client to the Vault engine, which is the
@@ -30,9 +30,9 @@ Requirements
 Installation
 ============
 
-Installing the client app is straighforward. Here's the steps:
+Installing the client app is straightforward. Here's the steps:
 
-1. Run `composer install` on the project root to bring in all the
+1. Run `composer install` in the project root to bring in all the
 dependencies.
 
 2. `cp config.ini.dist config.ini`
