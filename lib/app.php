@@ -283,8 +283,7 @@ class App {
 		$form->set( 'action', $this->router->generate( 'confirm#submission' ) );
 		$form->set( 'req_email', $this->user->email );
 		$form->set( 'user_email', $user_email );
-		$form->set( 'instructions',
-		            VaultClient::esc_instructions( $instructions ) );
+		$form->set( 'instructions', Esc::instructions( $instructions ) );
 
 		$this->display_page( __( 'Request Confirmation' ), $form );
 	}
