@@ -150,23 +150,6 @@ class App {
 		return $form;
 	}
 
-	protected function get_confirm_token( $timestamp, $req_email,
-	                                      $user_email, $instructions ) {
-		return strtr(
-			base64_encode(
-				hash_hmac(
-					'sha1',
-					"$timestamp $req_email $user_email $instructions",
-					$this->get_conf( 'api', 'secret' ),
-					true
-				) ),
-			[
-				'+' => '-',
-				'/' => '.',
-				'=' => '',
-			]);
-	}
-
 	protected function display_login_page() {
 		$wpcc_state = base64_encode( openssl_random_pseudo_bytes( 16 ) );
 		$this->session->setFlash( 'wpcc_state', $wpcc_state );
@@ -293,56 +276,12 @@ class App {
 			return;
 		}
 
-		$timestamp = microtime( true );
-
-		$body = $this->views->get( 'email-confirm' );
-		$body->set( 'token', $this->get_confirm_token( $timestamp,
-		                                               $this->user->email,
-		                                               $user_email,
-		                                               $instructions ) );
-
-		$mailer = new Mailer( $this->conf, $this->log );
-		$mailer->addAddress( $this->user->email );
-		$mailer->Subject = 'A Vault request awaits your confirmation';
-		$mailer->Body = (string) $body;
-
-		$mailer->send();
-
-		$this->session->setFlash( 'timestamp', $timestamp );
-		$this->session->setFlash( 'user_email', $user_email );
-		$this->session->setFlash( 'instructions', $instructions );
-
-		$this->response->redirect->afterPost(
-			$this->router->generate( 'confirm' )
-		);
-	}
-
-	protected function handle_confirm() {
-		$timestamp = $this->session->getFlash( 'timestamp' );
-		$user_email = $this->session->getFlash( 'user_email' );
-		$instructions = $this->session->getFlash( 'instructions' );
-
-		if ( empty( $timestamp ) || empty( $user_email ) ) {
-			// Should never happen, but let's stay on the safe side here.
-			$this->log->addNotice( 'Invalid session state' );
-			$this->response->redirect->to(
-				$this->router->generate( 'request' )
-			);
-			return;
-		}
-
-		if ( (time() - $timestamp) < 120 ) {
-			// Keep the request variables in session for at least 2 minutes.
-			$this->session->keepFlash();
-		}
-
 		$form = $this->views->get( 'confirm' );
 		$form->set( 'form_token',
 		            $this->root_session->getCsrfToken()->getValue() );
 
 		$form->set( 'action', $this->router->generate( 'confirm#submission' ) );
 		$form->set( 'req_email', $this->user->email );
-		$form->set( 'timestamp', $timestamp );
 		$form->set( 'user_email', $user_email );
 		$form->set( 'instructions',
 		            VaultClient::esc_instructions( $instructions ) );
@@ -353,24 +292,8 @@ class App {
 	protected function handle_confirm_submission() {
 		$this->check_form_token();
 
-		$timestamp = $this->request->post->get( 'timestamp' );
 		$user_email = $this->request->post->get( 'user_email' );
 		$instructions = $this->request->post->get( 'instructions' );
-
-		$token = $this->get_confirm_token( $timestamp,
-		                                   $this->user->email,
-		                                   $user_email,
-		                                   $instructions );
-
-		if ( ! hash_equals( $this->request->post->get( 'token' ), $token ) ) {
-			$this->session->setFlash( 'timestamp', $timestamp );
-			$this->session->setFlash( 'user_email', $user_email );
-			$this->session->setFlash( 'instructions', $instructions );
-			$this->flash_error( __( 'The confirmation token you entered is not valid.' ) );
-			$this->response->redirect->afterPost(
-				$this->router->generate( 'confirm' ) );
-			return;
-		}
 
 		$client = $this->new_client();
 

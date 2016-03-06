@@ -133,3 +133,7 @@ header nav {
 	display: block;
 	margin: 0 auto;
 }
+
+#confirm-input {
+	margin-bottom: 1em;
+}
