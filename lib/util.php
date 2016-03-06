@@ -113,3 +113,19 @@ class User {
 		$this->name = $name;
 	}
 }
+
+
+class Esc {
+
+	static public function html( $string, $quote_style = ENT_NOQUOTES ) {
+		return htmlspecialchars( $string, $quote_style | ENT_HTML5, 'UTF-8' );
+	}
+
+	static public function attr( $string ) {
+		return htmlspecialchars( $string, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+	}
+
+	static public function instructions( $string ) {
+		return strip_tags( $string, VaultClient::INSTRUCTIONS_ALLOWED_TAGS );
+	}
+}
