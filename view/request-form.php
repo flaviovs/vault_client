@@ -1,3 +1,6 @@
+<?php
+use Vault_Client\Esc;
+?>
 <p>Use this form to securely receive information from an user:</p>
 
 <ul>
@@ -6,15 +9,15 @@
 </ul>
 
 <form method="POST" action="/">
-  <input type="hidden" name="form_token" value="<?php echo htmlspecialchars($form_token) ?>">
+  <input type="hidden" name="form_token" value="<?php echo Esc::attr( $form_token ) ?>">
   <div id="element-req-email" class="form-group">
 	<label for="req-email">Your e-mail address</label>
-	<input type="email" name="disabled-req-email" value="<?php echo htmlspecialchars($req_email) ?>" disabled class="input-text">
+	<input type="email" name="disabled-req-email" value="<?php echo Esc::attr( $req_email ) ?>" disabled class="input-text">
   </div>
 
   <div id="element-user-email" class="form-group<?php echo empty($user_email_error) ? '' : ' error' ?>">
 	<label for="user-email">User's e-mail address</label>
-	<input type="email" name="user-email" value="<?php echo htmlspecialchars($user_email) ?>" required class="input-text">
+	<input type="email" name="user-email" value="<?php echo Esc::attr( $user_email ) ?>" required class="input-text">
 	<?php if ( ! empty($user_email_error) ): ?>
 	<div class="error"><?php echo $user_email_error ?></div>
 	<?php endif ?>
@@ -22,7 +25,7 @@
 
   <div class="form-group">
 	<label for="instructions">Additional instructions</label>
-	<textarea name="instructions" rows="5"><?php echo htmlspecialchars($instructions) ?></textarea>
+	<textarea name="instructions" rows="5"><?php echo Esc::html($instructions) ?></textarea>
 	<div class="help">You can use basic HTML like &lt;b&gt;, &lt;i&gt;, and HTML lists.</div>
 
   </div>

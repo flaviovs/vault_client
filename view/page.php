@@ -1,4 +1,7 @@
 <!DOCTYPE html>
+<?php
+use Vault_Client\Esc;
+?>
 <html>
   <head>
 	<title><?php echo $title ?></title>
@@ -8,7 +11,7 @@
 	<main>
 <?php if ( $user ): ?>
 	  <header>
-		<div id="welcome">Howdy, <b><?php echo htmlspecialchars($user->name) ?></b>!</div>
+		<div id="welcome">Howdy, <b><?php echo Esc::html($user->name) ?></b>!</div>
 		<nav>
 		  <a href="/logout">Logout</a>
 		</nav>
