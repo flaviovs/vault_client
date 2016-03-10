@@ -1,17 +1,19 @@
 Howdy!
 
-The user responded to your Vault Request. Please, visit the URL below
-to see the information that was submitted:
+The user responded to your Vault request. Please, visit the URL below
+to see what was submitted:
 
   <?php echo $unlock_url ?>
 
+IMPORTANT:
 
-To unlock the information, copy and paste the key below:
+* After you click the URL above, the information will be unlocked
+  immediately.
 
-  <?php echo $unlock_key ?>
+* Because of this, it will be immediatelly erased from Vault, so be
+  prepared to handle the information when you click.
 
+* The URL above will expire soon. So, visit it ASAP!
 
-Notice: the URL above will expire soon. Visit it ASAP!
-
--- 
-The Vault
+--
+Vault
