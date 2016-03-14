@@ -33,13 +33,14 @@ class VaultClient {
 		$res = curl_exec( $ch );
 
 		$error = null;
-		if ( $res ) {
-			$code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
-			if ( 200 != $code ) {
-				$error = "$this->url returned HTTP $code";
-			}
+		$code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
+		if ( 200 != $code ) {
+			$error = "$this->url returned HTTP $code";
 		} else {
 			$error = curl_error( $ch );
+			if ( ! $error ) {
+				$error = 'Unknown error returned by API';
+			}
 		}
 		curl_close( $ch );
 
