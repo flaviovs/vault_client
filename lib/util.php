@@ -19,7 +19,7 @@ class Mailer extends \PHPMailer {
 			throw new \RuntimeException( 'No mailer configuration found' );
 		}
 
-		$conf = $conf['mailer' ];
+		$conf = $conf['mailer'];
 
 		if ( empty( $conf['from_address'] ) ) {
 			throw new \RuntimeException( 'Missing from_address mailer configuration' );
@@ -32,7 +32,9 @@ class Mailer extends \PHPMailer {
 		$this->debug = ! empty( $conf['debug'] );
 
 		if ( $this->debug ) {
+			// @codingStandardsIgnoreStart
 			$this->Mailer = 'debug';
+			// @codingStandardsIgnoreEnd
 		}
 
 		$this->setFrom( $conf['from_address'], $conf['from_name'] );
@@ -52,20 +54,20 @@ class Mailer extends \PHPMailer {
 	}
 }
 
-class MessageArea {
+class Message_Area {
 	const INFO = 0;
 	const ERROR = 1;
 
 	protected $messages = [
-		MessageArea::INFO => [],
-		MessageArea::ERROR => [],
+		Message_Area::INFO => [],
+		Message_Area::ERROR => [],
 	];
 
-	public function addMessage( $level, $msg ) {
+	public function add_message( $level, $msg ) {
 		$this->messages[ $level ][] = $msg;
 	}
 
-	public function getMessagesList( $level ) {
+	public function get_message_list( $level ) {
 		switch ( count( $this->messages[ $level ] ) ) {
 			case 0:
 				return '';
@@ -84,8 +86,8 @@ class MessageArea {
 	}
 
 	public function __toString() {
-		$info = $this->getMessagesList( static::INFO );
-		$error = $this->getMessagesList( static::ERROR );
+		$info = $this->get_message_list( static::INFO );
+		$error = $this->get_message_list( static::ERROR );
 
 		$out = '';
 

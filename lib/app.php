@@ -44,7 +44,7 @@ class App {
 
 		$this->views = new \UView\Registry( __DIR__ . '/../view' );
 
-		$this->messages = new MessageArea();
+		$this->messages = new Message_Area();
 
 	}
 
@@ -100,11 +100,11 @@ class App {
 	}
 
 	protected function flash_info( $msg ) {
-		$this->flash_message( $msg, MessageArea::INFO );
+		$this->flash_message( $msg, Message_Area::INFO );
 	}
 
 	protected function flash_error( $msg ) {
-		$this->flash_message( $msg, MessageArea::ERROR );
+		$this->flash_message( $msg, Message_Area::ERROR );
 	}
 
 	protected function display_page( $title, $contents ) {
@@ -112,7 +112,7 @@ class App {
 
 		foreach ( $this->session->getFlash( 'messages', [] ) as $level => $msgs ) {
 			foreach ( $msgs as $msg ) {
-				$this->messages->addMessage( $level, $msg );
+				$this->messages->add_message( $level, $msg );
 			}
 		}
 
@@ -314,8 +314,10 @@ class App {
 
 		$mailer = new Mailer( $this->conf, $this->log );
 		$mailer->addAddress( $args['app_data'] );
+		// @codingStandardsIgnoreStart
 		$mailer->Subject = 'The information you requested is now available';
 		$mailer->Body = (string) $body;
+		// @codingStandardsIgnoreEnd
 
 		$mailer->send();
 
