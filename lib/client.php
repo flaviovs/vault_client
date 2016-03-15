@@ -36,7 +36,7 @@ class VaultClient {
 		$code = curl_getinfo( $ch, CURLINFO_HTTP_CODE );
 		if ( 200 != $code ) {
 			$error = "$this->url returned HTTP $code";
-		} else {
+		} elseif ( empty( $res ) ) {
 			$error = curl_error( $ch );
 			if ( ! $error ) {
 				$error = 'Unknown error returned by API';
